@@ -1,0 +1,13 @@
+{
+  "name": "game-of-life-workshop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Conway's Game of Life, built test-first as an AI pair-programming exercise",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test ProductivityConf.AiPairProgramming.Library/GameOfLife.test.js"
+  }
+}
