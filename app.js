@@ -121,9 +121,52 @@ function updateControls() {
 
 // Events
 
+// Drawing with a mouse, pen or finger: press on a cell and drag across others.
+// Starting on a dead cell brings cells to life; starting on a live one erases.
+let paintAlive = null;
+let lastRow = 0;
+let lastCol = 0;
+
+function setCell(row, col) {
+    if ((game.grid[row][col] === 1) !== paintAlive) game.toggleCell(row, col);
+}
+
+// A fast drag can jump several cells between pointer events, so fill in the cells along the way.
+function paintTo(row, col) {
+    const steps = Math.max(Math.abs(row - lastRow), Math.abs(col - lastCol));
+    for (let i = 1; i <= steps; i++) {
+        setCell(Math.round(lastRow + (row - lastRow) * i / steps), Math.round(lastCol + (col - lastCol) * i / steps));
+    }
+    lastRow = row;
+    lastCol = col;
+    moveFocus(row, col, { focus: false });
+    render();
+}
+
+gridEl.addEventListener('pointerdown', event => {
+    const cell = event.target.closest('.cell');
+    if (!cell || event.button !== 0) return;
+    lastRow = Number(cell.dataset.row);
+    lastCol = Number(cell.dataset.col);
+    paintAlive = game.grid[lastRow][lastCol] === 0;
+    setCell(lastRow, lastCol);
+    paintTo(lastRow, lastCol);
+});
+
+// A touch pointer stays tied to the cell it started on, so find the cell under it instead.
+gridEl.addEventListener('pointermove', event => {
+    if (paintAlive === null) return;
+    const cell = document.elementFromPoint(event.clientX, event.clientY)?.closest('.cell');
+    if (cell) paintTo(Number(cell.dataset.row), Number(cell.dataset.col));
+});
+
+window.addEventListener('pointerup', () => { paintAlive = null; });
+window.addEventListener('pointercancel', () => { paintAlive = null; });
+
+// Space and Enter on a focused cell arrive as a click with no pointer (detail 0).
 gridEl.addEventListener('click', event => {
     const cell = event.target.closest('.cell');
-    if (!cell) return;
+    if (!cell || event.detail !== 0) return;
     const row = Number(cell.dataset.row);
     const col = Number(cell.dataset.col);
     game.toggleCell(row, col);

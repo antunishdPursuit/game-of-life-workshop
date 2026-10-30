@@ -12,7 +12,7 @@ This repository started as a workshop exercise in AI pair programming. The goal 
 
 ## What You Can Do
 
-- Draw or erase live cells by clicking or tapping the grid
+- Draw or erase live cells by clicking, tapping or dragging across the grid
 - Load a block, blinker or glider into the middle of the grid
 - Play and pause the simulation, or step one generation at a time
 - Change the speed from 1 to 20 generations per second
@@ -46,6 +46,7 @@ The grid is finite. Cells past the edge count as dead, so on the full 24 × 24 g
 ### Desktop
 
 - Toggle a cell: click it
+- Draw several cells: hold the mouse button and drag; starting on a live cell erases instead
 - Enter the grid: `Tab` (the grid is a single tab stop)
 - Move between cells: arrow keys, or `Home` and `End` for the ends of a row
 - Toggle the focused cell: `Space` or `Enter`
@@ -54,6 +55,7 @@ The grid is finite. Cells past the edge count as dead, so on the full 24 × 24 g
 ### Phone
 
 - Toggle a cell: tap it
+- Draw several cells: drag a finger across the grid (the page does not scroll while your finger is on the grid)
 - The grid sits above the controls and keeps every cell at least 24px wide
 
 Step, Load and Clear announce the new generation to screen readers. Playing does not, so announcements never flood.
