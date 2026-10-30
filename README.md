@@ -13,6 +13,7 @@ This repository started as a workshop exercise in AI pair programming. The goal 
 ## What You Can Do
 
 - Draw or erase live cells by clicking, tapping or dragging across the grid
+- Watch each live cell as a small pixel creature that shows how old it is and whether it is about to die
 - Load a block, blinker or glider into the middle of the grid
 - Play and pause the simulation, or step one generation at a time
 - Change the speed from 1 to 20 generations per second
@@ -29,8 +30,19 @@ Click, tap or key press
   -> app.js (draws the grid, handles input, runs the timer)
   -> src/GameOfLife.js (owns the grid and the rules)
   -> nextGeneration: every cell decided from the previous grid at once
+  -> src/creatures.js picks a creature for each live cell from its age and neighbours
   -> app.js redraws only the cells that changed
 ```
+
+Each live cell is drawn as a creature. The first match wins:
+
+- Crowded (red and squished): four or more live neighbours, so it dies next step
+- Lonely (frowning): zero or one live neighbours, so it also dies next step
+- Newborn (small, with a curl of hair): born this step
+- Elder (grey, with a hat): alive for 10 steps or more
+- Adult: everything else
+
+A block turns into four elders, a blinker keeps an elder in the middle with two lonely ends, and a glider stays young because it moves by being reborn.
 
 Each step applies the four rules to every cell simultaneously:
 
@@ -92,13 +104,15 @@ npm test
 dotnet test ProductivityConf.AiPairProgramming.sln
 ```
 
-`npm test` runs the JavaScript engine tests; there are no packages to install. `dotnet test` builds the solution and runs the C# tests. Both suites check the same behaviour: grid size, neighbour counts at edges and corners, each rule, simultaneous updates, the block, blinker and glider, stepping, toggling, clearing and loading patterns.
+`npm test` runs the JavaScript engine tests and the tests for how creatures are chosen; there are no packages to install. `dotnet test` builds the solution and runs the C# tests. Both suites check the same behaviour: grid size, neighbour counts at edges and corners, each rule, simultaneous updates, the block, blinker and glider, stepping, toggling, clearing and loading patterns.
 
 The tests cover the engines, not the page. The page was checked by hand in a browser with mouse and keyboard at desktop, tablet and phone widths, in light and dark mode. It has not yet been tested with a screen reader or on a real phone.
 
 ## Technical Notes
 
 - The rules live only in the engine. `app.js` has no game logic: it draws the grid and calls `step`, `toggleCell`, `clear` and `loadPattern`.
+- The creatures never change the rules. `src/creatures.js` only reads the grid, tracks how long each cell has been alive, and names a look; `sprites.js` holds the 12 × 12 pixel drawings, which take their colours from the page theme. Windows high-contrast mode shows plain squares instead.
+- Screen readers hear the look as part of each cell, for example "Row 5, column 3, alive, elder".
 - `nextGeneration` builds a new grid instead of changing the old one, which is what makes the update simultaneous. A test fails if cells are updated in place.
 - The C# engine mirrors the JavaScript API with `bool` cells instead of `0` and `1`.
 - The grid size is chosen once on load: as many cells as fit at 24px or larger, up to 24 × 24.

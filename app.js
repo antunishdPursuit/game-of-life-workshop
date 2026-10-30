@@ -1,4 +1,6 @@
 import GameOfLife from './src/GameOfLife.js';
+import { startAges, nextAges, lookOf } from './src/creatures.js';
+import { addCreatureSymbols } from './sprites.js';
 
 // The interface only draws the grid and calls the engine; the rules live in src/GameOfLife.js.
 
@@ -28,14 +30,32 @@ const size = pickGridSize();
 const game = new GameOfLife(size, size);
 gridEl.style.setProperty('--cols', size);
 
+// How long each cell has been alive, used to pick its creature (see src/creatures.js).
+let ages = startAges(game.grid);
+
+function resetAges() {
+    ages = startAges(game.grid);
+}
+
+// A cell drawn or erased by hand starts over: newborn if alive, age 0 if dead.
+function toggleByHand(row, col) {
+    game.toggleCell(row, col);
+    ages[row][col] = game.grid[row][col];
+}
+
+addCreatureSymbols();
+
 // One button per cell; only the focused cell is in the tab order (roving tabindex).
+const SVG_NS = 'http://www.w3.org/2000/svg';
 const cells = [];
+const creatures = [];
 const drawn = [];
 let focusRow = 0;
 let focusCol = 0;
 
 for (let r = 0; r < size; r++) {
     cells.push([]);
+    creatures.push([]);
     drawn.push([]);
     for (let c = 0; c < size; c++) {
         const cell = document.createElement('button');
@@ -44,21 +64,31 @@ for (let r = 0; r < size; r++) {
         cell.tabIndex = -1;
         cell.dataset.row = r;
         cell.dataset.col = c;
+        const svg = document.createElementNS(SVG_NS, 'svg');
+        svg.setAttribute('viewBox', '0 0 12 12');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.classList.add('creature');
+        const use = document.createElementNS(SVG_NS, 'use');
+        svg.append(use);
+        cell.append(svg);
         gridEl.append(cell);
         cells[r].push(cell);
-        drawn[r].push(null);
+        creatures[r].push(use);
+        drawn[r].push(undefined);
     }
 }
 
 function render() {
     for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
-            const alive = game.grid[r][c] === 1;
-            if (drawn[r][c] === alive) continue;
-            drawn[r][c] = alive;
+            const alive = game.grid[r][c];
+            const look = alive ? lookOf(alive, ages[r][c], GameOfLife.countLiveNeighbors(game.grid, r, c)) : null;
+            if (drawn[r][c] === look) continue;
+            drawn[r][c] = look;
             const cell = cells[r][c];
-            cell.classList.toggle('live', alive);
-            cell.setAttribute('aria-label', `Row ${r + 1}, column ${c + 1}, ${alive ? 'alive' : 'dead'}`);
+            cell.classList.toggle('live', look !== null);
+            if (look) creatures[r][c].setAttribute('href', `#creature-${look}`);
+            cell.setAttribute('aria-label', `Row ${r + 1}, column ${c + 1}, ${look ? `alive, ${look}` : 'dead'}`);
         }
     }
     generationEl.textContent = game.generation;
@@ -91,7 +121,9 @@ function isPlaying() {
 }
 
 function tick() {
+    const previous = game.grid;
     game.step();
+    ages = nextAges(previous, game.grid, ages);
     render();
 }
 
@@ -128,7 +160,7 @@ let lastRow = 0;
 let lastCol = 0;
 
 function setCell(row, col) {
-    if ((game.grid[row][col] === 1) !== paintAlive) game.toggleCell(row, col);
+    if ((game.grid[row][col] === 1) !== paintAlive) toggleByHand(row, col);
 }
 
 // A fast drag can jump several cells between pointer events, so fill in the cells along the way.
@@ -169,7 +201,7 @@ gridEl.addEventListener('click', event => {
     if (!cell || event.detail !== 0) return;
     const row = Number(cell.dataset.row);
     const col = Number(cell.dataset.col);
-    game.toggleCell(row, col);
+    toggleByHand(row, col);
     moveFocus(row, col, { focus: false });
     render();
 });
@@ -208,6 +240,7 @@ stepButton.addEventListener('click', () => {
 clearButton.addEventListener('click', () => {
     pause();
     game.clear();
+    resetAges();
     render();
     announce('Grid cleared. Generation 0');
 });
@@ -230,12 +263,14 @@ loadButton.addEventListener('click', () => {
     pause();
     const name = patternSelect.value;
     game.loadPattern(name);
+    resetAges();
     render();
     announce(`${patternSelect.selectedOptions[0].text} loaded. Generation 0`);
 });
 
 // First view: a glider at generation 0, so Play does something straight away.
 game.loadPattern('glider');
+resetAges();
 moveFocus(Math.floor((size - 3) / 2), Math.floor((size - 3) / 2), { focus: false });
 render();
 updateControls();
