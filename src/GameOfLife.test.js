@@ -232,3 +232,66 @@ describe('step', () => {
         ));
     });
 });
+
+describe('toggleCell', () => {
+    test('brings a dead cell to life and kills a live one', () => {
+        const game = new GameOfLife(3, 3);
+
+        game.toggleCell(1, 2);
+        assert.equal(game.grid[1][2], 1);
+
+        game.toggleCell(1, 2);
+        assert.equal(game.grid[1][2], 0);
+    });
+
+    test('rejects a cell outside the grid', () => {
+        const game = new GameOfLife(3, 3);
+
+        assert.throws(() => game.toggleCell(3, 0), RangeError);
+        assert.throws(() => game.toggleCell(0, -1), RangeError);
+    });
+});
+
+describe('clear', () => {
+    test('kills every cell and resets the generation counter', () => {
+        const game = new GameOfLife(3, 3);
+        game.grid = parse('###', '###', '###');
+        game.generation = 7;
+
+        game.clear();
+
+        assert.deepEqual(game.grid, parse('...', '...', '...'));
+        assert.equal(game.generation, 0);
+    });
+});
+
+describe('loadPattern', () => {
+    test('offers block, blinker and glider', () => {
+        assert.deepEqual(Object.keys(GameOfLife.PATTERNS), ['block', 'blinker', 'glider']);
+    });
+
+    test('clears the grid and places the pattern in the middle', () => {
+        const game = new GameOfLife(5, 5);
+        game.toggleCell(0, 0);
+        game.generation = 3;
+
+        game.loadPattern('glider');
+
+        assert.equal(game.generation, 0);
+        assert.deepEqual(game.grid, parse(
+            '.....',
+            '..#..',
+            '...#.',
+            '.###.',
+            '.....',
+        ));
+    });
+
+    test('rejects an unknown pattern', () => {
+        assert.throws(() => new GameOfLife().loadPattern('spaceship'), RangeError);
+    });
+
+    test('rejects a pattern bigger than the grid', () => {
+        assert.throws(() => new GameOfLife(2, 2).loadPattern('glider'), RangeError);
+    });
+});
