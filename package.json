@@ -4,10 +4,11 @@
   "private": true,
   "description": "Conway's Game of Life, built test-first as an AI pair-programming exercise",
   "license": "UNLICENSED",
+  "type": "module",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test ProductivityConf.AiPairProgramming.Library/GameOfLife.test.js"
+    "test": "node --test src/GameOfLife.test.js"
   }
 }

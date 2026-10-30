@@ -1,6 +1,6 @@
-const { describe, test } = require('node:test');
-const assert = require('node:assert/strict');
-const GameOfLife = require('./GameOfLife');
+import { describe, test } from 'node:test';
+import assert from 'node:assert/strict';
+import GameOfLife from './GameOfLife.js';
 
 // Builds a grid from rows of text: '#' is alive, '.' is dead.
 function parse(...rows) {
