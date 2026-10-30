@@ -19,7 +19,7 @@ This repository started as a workshop exercise in AI pair programming. The goal 
 - Change the speed from 1 to 20 generations per second
 - Clear the grid and reset the generation counter
 - Use the whole page with the keyboard alone
-- Use it on desktop or phone, in light or dark mode
+- Use it on desktop or phone, in light or dark mode: it follows your system setting until you pick one with the button beside the title, and remembers your choice
 
 The page opens with a glider loaded, so Play does something straight away.
 
@@ -63,6 +63,7 @@ The grid is finite. Cells past the edge count as dead, so on the full 24 × 24 g
 - Move between cells: arrow keys, or `Home` and `End` for the ends of a row
 - Toggle the focused cell: `Space` or `Enter`
 - Leave the grid: `Tab` to the Play button
+- Switch between light and dark mode: the button beside the title
 
 ### Phone
 
@@ -106,7 +107,7 @@ dotnet test ProductivityConf.AiPairProgramming.sln
 
 `npm test` runs the JavaScript engine tests and the tests for how creatures are chosen; there are no packages to install. `dotnet test` builds the solution and runs the C# tests. Both suites check the same behaviour: grid size, neighbour counts at edges and corners, each rule, simultaneous updates, the block, blinker and glider, stepping, toggling, clearing and loading patterns.
 
-The tests cover the engines, not the page. The page was checked by hand in a browser with mouse and keyboard at desktop, tablet and phone widths, in light and dark mode. It has not yet been tested with a screen reader or on a real phone.
+The tests cover the engines, not the page. The page was checked by hand in a browser with mouse and keyboard at desktop, tablet and phone widths, in light and dark mode. It has not been tested with a screen reader, on a real phone or in Windows high-contrast mode.
 
 ## Technical Notes
 
@@ -124,7 +125,7 @@ The tests cover the engines, not the page. The page was checked by hand in a bro
 - Resizing the window does not resize the grid; reload to change it
 - There are three starter patterns and no saving or sharing
 - The C# engine is a library with tests and has no interface
-- Screen-reader and real-phone testing are still pending
+- It has not been tested with a screen reader, on a real phone or in Windows high-contrast mode
 
 ## Project Lineage
 
@@ -139,4 +140,4 @@ In October 2026 Dennis finished the project with Claude Code, an AI coding assis
 
 ## Status
 
-The JavaScript engine, the C# companion and the browser page are complete and tested. GitHub Pages publishing, screen-reader testing and real-phone testing are pending.
+Complete. The JavaScript engine, the C# companion and the browser page are finished and tested, and the page is live on GitHub Pages. Screen-reader, real-phone and high-contrast testing were not done.

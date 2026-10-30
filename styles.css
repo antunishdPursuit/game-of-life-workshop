@@ -16,8 +16,9 @@
     --gutter: 16px;
 }
 
+/* Dark tokens apply when the system is dark and the visitor has not picked light, or when they picked dark. */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
         --surface: #161B26;
         --panel: #1E2533;
         --grid-line: #2E3749;
@@ -29,6 +30,33 @@
         --border: #6E7894;
     }
 }
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface: #161B26;
+    --panel: #1E2533;
+    --grid-line: #2E3749;
+    --cell-live: #F2E8CF;
+    --text: #ECE6D6;
+    --text-muted: #A7AEBF;
+    --accent: #E5704F;
+    --on-accent: #161B26;
+    --border: #6E7894;
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .icon-sun,
+    :root:not([data-theme="light"]) .theme-toggle .label-light { display: block; }
+    :root:not([data-theme="light"]) .theme-toggle .icon-moon,
+    :root:not([data-theme="light"]) .theme-toggle .label-dark { display: none; }
+}
+
+:root[data-theme="dark"] .theme-toggle .icon-sun,
+:root[data-theme="dark"] .theme-toggle .label-light { display: block; }
+:root[data-theme="dark"] .theme-toggle .icon-moon,
+:root[data-theme="dark"] .theme-toggle .label-dark { display: none; }
 
 @media (min-width: 768px) {
     :root { --gutter: 32px; }
@@ -53,6 +81,12 @@ body {
 }
 
 .intro { display: flex; flex-direction: column; gap: 8px; }
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.theme-toggle { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+/* The button offers the other mode. CSS picks the icon and label, so it is right before any script runs. */
+.theme-toggle .icon-sun,
+.theme-toggle .label-light { display: none; }
+.secondary.theme-toggle:not(:disabled):hover { background: var(--panel); }
 h1 { margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; }
 p { margin: 0; }
 .muted { color: var(--text-muted); }

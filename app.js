@@ -268,6 +268,24 @@ loadButton.addEventListener('click', () => {
     announce(`${patternSelect.selectedOptions[0].text} loaded. Generation 0`);
 });
 
+// Light and dark mode. The page follows the system until the visitor picks one,
+// and the choice is remembered on this device (index.html applies it before the first paint).
+// styles.css shows the right icon and label for each mode; this only switches and saves.
+const themeButton = document.getElementById('theme');
+const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+function currentTheme() {
+    return document.documentElement.dataset.theme ?? (systemDark.matches ? 'dark' : 'light');
+}
+
+// The ?. covers a browser briefly pairing an older cached page with this script.
+themeButton?.addEventListener('click', () => {
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch {}
+    announce(`${next === 'dark' ? 'Dark' : 'Light'} mode on`);
+});
+
 // First view: a glider at generation 0, so Play does something straight away.
 game.loadPattern('glider');
 resetAges();
