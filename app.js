@@ -169,8 +169,14 @@ clearButton.addEventListener('click', () => {
     announce('Grid cleared. Generation 0');
 });
 
-speedInput.addEventListener('input', () => {
+// The readout shows "5 / s"; screen readers hear the unit spelled out.
+function showSpeed() {
     speedValue.textContent = `${speed()} / s`;
+    speedInput.setAttribute('aria-valuetext', `${speed()} generations per second`);
+}
+
+speedInput.addEventListener('input', () => {
+    showSpeed();
     if (isPlaying()) {
         clearInterval(timer);
         startTimer();
@@ -190,3 +196,4 @@ game.loadPattern('glider');
 moveFocus(Math.floor((size - 3) / 2), Math.floor((size - 3) / 2), { focus: false });
 render();
 updateControls();
+showSpeed();
